@@ -1,26 +1,37 @@
 name: stock-alert
- 
+
 on:
   schedule:
-    # 매시간 정각 실행 (UTC 기준이지만 '매시간'이라 한국시간도 매시 정각)
-    - cron: '0 * * * *'
+    - cron: '0 * * * *'   # 매시간
   workflow_dispatch:
- 
+
+# 알림 기록 파일(alert_state.json)을 저장소에 다시 커밋하려면 쓰기 권한 필요
+permissions:
+  contents: write
+
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
- 
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
- 
+
       - name: install
         run: pip install -r requirements.txt
- 
+
       - name: check alerts
         env:
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
           KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
         run: python alert.py
+
+      - name: save alert state
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add alert_state.json || true
+          git commit -m "update alert state" || echo "변경 없음"
+          git push || echo "push 생략"
