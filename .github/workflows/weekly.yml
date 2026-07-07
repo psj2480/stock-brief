@@ -1,0 +1,23 @@
+name: weekly-report
+ 
+on:
+  schedule:
+    # 금요일 한국 17:00 = 금요일 UTC 08:00
+    - cron: '0 8 * * 5'
+  workflow_dispatch:
+ 
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: install
+        run: pip install -r requirements.txt
+      - name: send weekly report
+        env:
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: python weekly_report.py
