@@ -2,7 +2,7 @@ name: daily-stock-brief
 
 on:
   schedule:
-    - cron: '30 22 * * *'
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 jobs:
