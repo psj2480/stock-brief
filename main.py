@@ -2,6 +2,7 @@
 """
 매일 아침 주식 브리핑을 카카오톡 '나에게 보내기'로 발송.
 메시지 2개: (1) 시황 요약 텍스트  (2) 링크되는 뉴스 리스트
+시황 카드 버튼 → 상세 대시보드로 연결.
 """
  
 import os
@@ -13,14 +14,14 @@ import requests
 REST_API_KEY = os.environ.get("KAKAO_REST_API_KEY", "")
 REFRESH_TOKEN = os.environ.get("KAKAO_REFRESH_TOKEN", "")
  
-# 뉴스 카드 헤더/버튼이 가리킬 주소 (도메인 등록 필요: finance.naver.com)
+# 상세 대시보드 주소 (도메인 등록 필요: streamlit.app)
+DASH_URL = "https://stock-brief-awabqughlprhglntapruke.streamlit.app/"
+# 뉴스 카드가 가리킬 주소 (도메인 등록됨: finance.naver.com)
 NEWS_PAGE_URL = "https://finance.naver.com/news/mainnews.naver"
-SISE_PAGE_URL = "https://finance.naver.com/sise/"
  
-NEWS_COUNT = 5  # 뉴스 개수 (리스트 템플릿은 최대 5개)
+NEWS_COUNT = 5
 NEWS_QUERY = "코스피 OR 증시 OR 반도체"
  
-# 뉴스 항목에 표시할 아이콘 이미지 (카카오 공식 예제용 이미지)
 ITEM_IMAGE = ("https://mud-kage.kakao.com/dn/Q2iNx/btqgeRgV54P/"
               "VLdBs9cvyn8BJXB3o7N8UK/kakaolink40_original.png")
  
@@ -119,8 +120,8 @@ def send_text(token, text):
     template = {
         "object_type": "text",
         "text": text,
-        "link": {"web_url": SISE_PAGE_URL, "mobile_web_url": SISE_PAGE_URL},
-        "button_title": "국내증시 보기",
+        "link": {"web_url": DASH_URL, "mobile_web_url": DASH_URL},
+        "button_title": "대시보드 자세히 보기",
     }
     _send(token, template)
     print("[성공] 시황 카드 발송 완료")
@@ -177,7 +178,6 @@ def main():
     except Exception as e:
         print(f"[경고] 뉴스 수집 실패: {e}")
         items = []
-    # 리스트 템플릿은 항목이 2개 이상이어야 함
     if len(items) >= 2:
         send_news_list(token, items)
     elif len(items) == 1:
