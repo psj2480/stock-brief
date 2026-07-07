@@ -1,0 +1,41 @@
+name: session-brief
+ 
+on:
+  schedule:
+    # UTC 기준. 한국 08:00 = UTC 23:00(전날) → 개장 전 브리핑
+    - cron: '0 23 * * *'
+    # 한국 17:00 = UTC 08:00 → 마감 후 브리핑
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    inputs:
+      session:
+        description: '수동 실행 시 세션 선택'
+        default: 'morning'
+        type: choice
+        options: [morning, evening]
+ 
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: install
+        run: pip install -r requirements.txt
+      - name: decide session
+        id: sess
+        run: |
+          if [ "${{ github.event.schedule }}" = "0 23 * * *" ]; then
+            echo "name=morning" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "0 8 * * *" ]; then
+            echo "name=evening" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${{ github.event.inputs.session }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: send brief
+        env:
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: python session_brief.py ${{ steps.sess.outputs.name }}
