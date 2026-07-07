@@ -1,3 +1,6 @@
 requests
 finance-datareader
 feedparser
+pandas
+streamlit
+plotly
