@@ -15,6 +15,7 @@ REFRESH_TOKEN = os.environ.get("KAKAO_REFRESH_TOKEN", "")
  
 # 뉴스 카드 헤더/버튼이 가리킬 주소 (도메인 등록 필요: finance.naver.com)
 NEWS_PAGE_URL = "https://finance.naver.com/news/mainnews.naver"
+SISE_PAGE_URL = "https://finance.naver.com/sise/"
  
 NEWS_COUNT = 5  # 뉴스 개수 (리스트 템플릿은 최대 5개)
 NEWS_QUERY = "코스피 OR 증시 OR 반도체"
@@ -118,8 +119,8 @@ def send_text(token, text):
     template = {
         "object_type": "text",
         "text": text,
-        "link": {"web_url": NEWS_PAGE_URL, "mobile_web_url": NEWS_PAGE_URL},
-        "button_title": "전체 뉴스 보기",
+        "link": {"web_url": SISE_PAGE_URL, "mobile_web_url": SISE_PAGE_URL},
+        "button_title": "국내증시 보기",
     }
     _send(token, template)
     print("[성공] 시황 카드 발송 완료")
